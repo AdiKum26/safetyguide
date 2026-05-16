@@ -113,6 +113,11 @@ export default function Home() {
   );
 }
 
+function basename(path) {
+  if (!path) return '';
+  return String(path).split(/[\\/]/).pop();
+}
+
 function Message({ m }) {
   const isUser = m.role === 'user';
 
