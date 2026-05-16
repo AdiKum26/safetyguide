@@ -1,5 +1,9 @@
 # SAFETYGUIDE
 
+![SafetyGuide chatbot UI](docs/screenshots/chatbot.png)
+
+![Interactive PNW resource map](docs/screenshots/map.png)
+
 ## Inspiration
 
 The Pacific Northwest (PNW) faces a unique combination of significant natural disasters due to its location on the Ring of Fire and varied climate, primarily earthquakes, volcanic eruptions, tsunamis, wildfires, and flooding. The region is especially noted for the threat of a "Cascadia Subduction Zone" megathrust earthquake, which could produce catastrophic damage.
