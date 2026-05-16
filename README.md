@@ -4,6 +4,14 @@
 
 ![Interactive PNW resource map](docs/screenshots/map.png)
 
+## Demo
+
+Watch the demo on YouTube: [SafetyGuide.AI demo](https://youtu.be/UMFcAi7lDxU)
+
+[![SafetyGuide demo video](docs/screenshots/chatbot.png)](https://youtu.be/UMFcAi7lDxU)
+
+The demo walks through two queries: an in-corpus question ("What can I do against a volcano eruption?") that returns a cited answer from the local knowledge base, and an out-of-corpus question ("Who won the FIFA World Cup?") that the confidence gate correctly refuses. It also shows the interactive PNW resource map.
+
 ## Inspiration
 
 The Pacific Northwest (PNW) faces a unique combination of significant natural disasters due to its location on the Ring of Fire and varied climate, primarily earthquakes, volcanic eruptions, tsunamis, wildfires, and flooding. The region is especially noted for the threat of a "Cascadia Subduction Zone" megathrust earthquake, which could produce catastrophic damage.
