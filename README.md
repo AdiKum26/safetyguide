@@ -312,21 +312,33 @@ PYTHONPATH=server python -m server.tests.test_retrieve
 
 **Results on the current index** (170 chunks, 25 disaster types):
 
-| Stage | Metric | Value | Threshold | Status |
-|---|---|---|---|---|
-| Pre-rerank | P@15 | 0.320 | — | informational |
-| Pre-rerank | R@15 | 0.836 | ≥ 0.50 | ✅ |
-| Post-rerank | MRR | 0.911 | ≥ 0.50 | ✅ |
+| Stage | Metric | Value |
+| :--- | :--- | :--- |
+| Pre-rerank | P@15 | 0.320 |
+| Pre-rerank | R@15 | 0.836 |
+| Post-rerank | MRR | 0.911 |
 
 R@15 = 0.836 means the FAISS + BM25 + RRF stage surfaces 84% of relevant chunks before reranking. The 16% miss rate is concentrated in disaster types with thin coverage (tornado, flood) — a content problem, not an algorithm problem.
 
-MRR = 0.911 means on 25 of 27 non-gated queries, the very first returned chunk is the right one.
+- **R@15 = 0.836** — The FAISS + BM25 + RRF stage surfaces 84% of all relevant chunks before the cross-encoder runs. The 16% miss rate is concentrated in disaster types with thin corpus coverage (tornado, flood) where only 3 chunks exist, making any single miss a large percentage hit. This is a content-coverage problem, not a retrieval algorithm problem.
+- **MRR = 0.911** — On 25 of 27 queries that were not gated, the very first returned chunk is a relevant one. The cross-encoder is reliably placing the best chunk at rank 1 in the LLM prompt.
+- **Off-corpus gating** — All 3 off-corpus queries (sports trivia, restaurant recommendation, stock market) gate correctly with cross-encoder scores in the range `[0.0001, 0.0044]`, well below the `CONF_THRESHOLD = 0.1`. Legitimate in-corpus queries score `0.74–0.9997`. The gap between noise-floor and real matches is large enough that the gate is not at risk of false positives.
 
-All 3 off-corpus queries gate correctly with scores in `[0.0001, 0.0044]`, well below `CONF_THRESHOLD = 0.1`. Legitimate in-corpus queries score `0.74–0.9997`. The gap is large enough that false positives aren't a real risk.
+### Known open issues
 
-**Known weak spots:**
+Two in-corpus queries produce weak scores that surface as `WARN` in the test output:
 
-| Query | Score | Issue |
+| Query | top_score | Issue |
 |---|---|---|
-| *"twister is coming and I am in my car"* | 0.015 — gated | "Twister" doesn't match the tornado chunks. Fix: add `twister → tornado` to `_SYNONYMS` in `query.py` and/or ingest more tornado documents. |
-| *"power out for three days is my food in the fridge safe"* | 0.232 — fragile | The fridge-specific chunk isn't retrieved; a `space_weather` chunk surfaces instead. Fix: expand power-outage corpus or add a manual sidecar with explicit "fridge" / "refrigerator" / "food safety" vocabulary. |
+| *"twister is coming and I am in my car"* | 0.015 — gated | The colloquial phrasing "twister" doesn't match the three tornado chunks well enough to clear the confidence gate. Root cause: sparse tornado corpus coverage + synonym gap. Fix: add `twister → tornado` to `_SYNONYMS` in `query.py` and/or ingest more tornado source documents. |
+| *"power out for three days is my food in the fridge safe"* | 0.232 — fragile | The fridge-specific chunk (id 72) is not retrieved; a `space_weather` chunk surfaces instead. Root cause: the food-safety vocabulary in chunk 72 doesn't align well with the query semantically or by BM25 tokens. Fix: expand power-outage corpus or add a manual sidecar that uses explicit "fridge", "refrigerator", and "food safety" language. |
+
+---
+
+## Conventions for contributors
+
+- Use `pathlib.Path`, not string paths.
+- Type-hint public functions.
+- Every `server/src/` module stays runnable as a script (`PYTHONPATH=server python -m server.src.<name>`) for fast iteration in isolation.
+- No new dependencies that need a network connection at runtime. Hugging Face downloads must be cached locally before any offline demo.
+- Comments explain *why*, not *what*. The reference style lives in [`server/src/retrieve.py`](server/src/retrieve.py) and [`server/src/ingest.py`](server/src/ingest.py).
