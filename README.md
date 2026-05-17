@@ -330,7 +330,7 @@ Two stages of the pipeline are measured independently:
 Measured on the current 170-chunk index (25 disaster types, sources: Ready.gov, Red Cross, WA EMD):
 
 | Stage | Metric | Value |
-|---|---|---|---|---|
+| :--- | :--- | :--- |
 | Pre-rerank | P@15 | 0.320 |
 | Pre-rerank | R@15 | 0.836 |
 | Post-rerank | MRR | 0.911 |
